@@ -1,6 +1,9 @@
 require "rubygems"
 require "bundler/setup"
 require "stringex"
+require "cssminify"
+require "yui/compressor"
+require "html_compressor"
 
 ## -- Rsync Deploy config -- ##
 # Be sure your public key is listed in your server's ~/.ssh/authorized_keys file
@@ -223,6 +226,11 @@ task :deploy do
     Rake::Task[:generate].execute
   end
 
+  # Apply minification tasks
+  Rake::Task[:minify_css].execute
+  Rake::Task[:minify_js].execute
+  Rake::Task[:minify_html].execute
+
   Rake::Task[:copydot].invoke(source_dir, public_dir)
   Rake::Task["#{deploy_default}"].execute
 end
@@ -440,4 +448,43 @@ end
 
 desc "Notify various services about new content"
 task :notify => [:pingomatic, :sitemapgoogle, :sitemapbing] do
+end
+
+desc "Minify CSS"
+task :minify_css do
+  puts "## Minifying CSS"
+  compressor = CSSminify.new
+  Dir.glob("#{public_dir}/**/*.css").each do |name|
+    puts "Minifying #{name}"
+    input = File.read(name)
+    output = File.open("#{name}", "w")
+    output << compressor.compress(input)
+    output.close
+  end
+end
+
+desc "Minify JS"
+task :minify_js do
+  puts "## Minifying JS"
+  compressor = YUI::JavaScriptCompressor.new
+  Dir.glob("#{public_dir}/**/*.js").each do |name|
+    puts "Minifying #{name}"
+    input = File.read(name)
+    output = File.open("#{name}", "w")
+    output << compressor.compress(input)
+    output.close
+  end
+end
+
+desc "Minify HTML"
+task :minify_html do
+  puts "## Minifying HTML"
+  compressor = HtmlCompressor::HtmlCompressor.new
+  Dir.glob("#{public_dir}/**/*.html").each do |name|
+    puts "Minifying #{name}"
+    input = File.read(name)
+    output = File.open("#{name}", "w")
+    output << compressor.compress(input)
+    output.close
+  end
 end
