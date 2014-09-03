@@ -114,7 +114,8 @@ task :new_post, :title do |t, args|
     post.puts "title: \"#{title.gsub(/&/,'&amp;')}\""
     post.puts "date: #{Time.now.strftime('%Y-%m-%d %H:%M:%S %z')}"
     post.puts "comments: false"
-    post.puts "categories: "
+    post.puts "description: \"Description here, or Delete for auto-generated summary.\""
+    post.puts "categories:"
     post.puts "---"
   end
 end
