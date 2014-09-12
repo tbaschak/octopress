@@ -14,3 +14,5 @@ node_modules
 Gemfile.lock
 .themes/octostrap3/
 source/
+sass/
+preview.bash
